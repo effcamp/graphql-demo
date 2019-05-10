@@ -66,16 +66,20 @@ const typeDefs = `
 const resolvers = {
   Query: {
     me() {
-      return users.find(user=> user.id === 1)
+      return users.find(user => user.id === 1)
     },
-    users() {
-      return users;
+    async users() {
+      let users = await axios.get(`https://jsonplaceholder.typicode.com/users`)
+      return users.data.map(({ id, name, username, email }) => ({ id, name, username, email }))
+
     },
-    posts() {
-      return posts;
+    async posts() {
+      const posts = await axios.get(`https://jsonplaceholder.typicode.com/posts`)
+      return posts.data.map(({ userId, id, title, body }) => ({ userId, id, title, body }))
     },
-    comments() {
-      return comments;
+    async comments() {
+      const comments = await axios.get(`https://jsonplaceholder.typicode.com/comments`)
+      return comments.data.map(({ postId, id, name, email, body }) => ({ postId, id, name, email, body }))
     }
   },
   User: {
@@ -87,13 +91,13 @@ const resolvers = {
     author(p) {
       return users.find(u => u.id === p.userId)
     },
-    comments(p){
+    comments(p) {
       return comments.filter(comment => comment.postId === p.id)
     }
   },
   Comment: {
-   
-    post(p){
+
+    post(p) {
       return posts.find(post => post.id === p.postId)
     }
   }
